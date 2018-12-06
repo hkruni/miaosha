@@ -138,8 +138,8 @@ public class GoodsController {
     	GoodsDetailVo vo = new GoodsDetailVo();
     	vo.setGoods(goods);
     	vo.setUser(user);
-    	vo.setRemainSeconds(remainSeconds);
-    	vo.setMiaoshaStatus(miaoshaStatus);
+    	vo.setRemainSeconds(remainSeconds);//还剩多少秒开始
+    	vo.setMiaoshaStatus(miaoshaStatus);//当前状态0：未开始 1：开始  2：已结束
     	return Result.success(vo);
     }
     

@@ -17,12 +17,26 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Autowired
 	MiaoshaUserService userService;
-	
+
+	/**
+	 * 如果参数类型是MiaoshaUser，就用resolveArgument方法赋值
+	 * @param parameter
+	 * @return
+	 */
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> clazz = parameter.getParameterType();
 		return clazz==MiaoshaUser.class;
 	}
 
+	/**
+	 *从UserContext获取当前请求的User
+	 * @param parameter
+	 * @param mavContainer
+	 * @param webRequest
+	 * @param binderFactory
+	 * @return
+	 * @throws Exception
+	 */
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		return UserContext.getUser();

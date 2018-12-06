@@ -44,7 +44,7 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter{
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		if(handler instanceof HandlerMethod) {
-			MiaoshaUser user = getUser(request, response);
+			MiaoshaUser user = getUser(request, response);//user有可能是null
 			UserContext.setUser(user);
 			HandlerMethod hm = (HandlerMethod)handler;
 			AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
