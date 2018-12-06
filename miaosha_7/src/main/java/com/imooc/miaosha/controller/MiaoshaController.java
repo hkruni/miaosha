@@ -124,7 +124,7 @@ public class MiaoshaController implements InitializingBean {
     	if(order != null) {
     		return Result.error(CodeMsg.REPEATE_MIAOSHA);
     	}
-    	//入队
+    	//秒杀成功，消息入队，消费者负责数据入库
     	MiaoshaMessage mm = new MiaoshaMessage();
     	mm.setUser(user);
     	mm.setGoodsId(goodsId);

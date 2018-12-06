@@ -20,6 +20,9 @@ import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
 import com.imooc.miaosha.service.MiaoshaUserService;
 
+/**
+ *秒杀路径获取的限流拦截器
+ */
 @Service
 public class AccessInterceptor  extends HandlerInterceptorAdapter{
 	
@@ -28,7 +31,15 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter{
 	
 	@Autowired
 	RedisService redisService;
-	
+
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @return
+	 * @throws Exception
+	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
@@ -37,29 +48,29 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter{
 			UserContext.setUser(user);
 			HandlerMethod hm = (HandlerMethod)handler;
 			AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
-			if(accessLimit == null) {
+			if(accessLimit == null) {//对有AccessLimit注解的controller才进行拦截
 				return true;
 			}
-			int seconds = accessLimit.seconds();
-			int maxCount = accessLimit.maxCount();
-			boolean needLogin = accessLimit.needLogin();
+			int seconds = accessLimit.seconds();//几秒内
+			int maxCount = accessLimit.maxCount();//最大访问次数
+			boolean needLogin = accessLimit.needLogin();//是否需要登录
 			String key = request.getRequestURI();
 			if(needLogin) {
-				if(user == null) {
+				if(user == null) {//没有登录先登录
 					render(response, CodeMsg.SESSION_ERROR);
 					return false;
 				}
-				key += "_" + user.getId();
+				key += "_" + user.getId();//key的格式为url_userid
 			}else {
 				//do nothing
 			}
 			AccessKey ak = AccessKey.withExpire(seconds);
 			Integer count = redisService.get(ak, key, Integer.class);
-	    	if(count  == null) {
+	    	if(count  == null) {//此一次访问，创建key
 	    		 redisService.set(ak, key, 1);
-	    	}else if(count < maxCount) {
+	    	}else if(count < maxCount) {//访问次数不超阈值，+1
 	    		 redisService.incr(ak, key);
-	    	}else {
+	    	}else {//访问次数超阈值，返回错误信息
 	    		render(response, CodeMsg.ACCESS_LIMIT_REACHED);
 	    		return false;
 	    	}
